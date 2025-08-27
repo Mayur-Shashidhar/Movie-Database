@@ -31,9 +31,16 @@ npm install
 - **TMDb API Key:** [Get one here](https://www.themoviedb.org/settings/api)
 - **YouTube Data API Key:** [Get one here](https://console.cloud.google.com/apis/library/youtube.googleapis.com)
 
-### 4. Configure API Keys
-- Open `src/App.js` and `src/components/MovieDetails.js`.
-- Replace the placeholder API keys with your own.
+### 4. Configure Environment Variables
+- Copy `.env.example` to `.env`:
+  ```sh
+  cp .env.example .env
+  ```
+- Open `.env` file and replace the placeholder values with your actual API keys:
+  ```
+  REACT_APP_TMDB_API_KEY=your_actual_tmdb_api_key
+  REACT_APP_YOUTUBE_API_KEY=your_actual_youtube_api_key
+  ```
 
 ### 5. Run the App
 ```sh

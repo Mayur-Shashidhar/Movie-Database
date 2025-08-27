@@ -3,7 +3,12 @@ import axios from "axios";
 
 const fallbackPoster = "https://via.placeholder.com/200x300.png?text=No+Image";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
-const YOUTUBE_API_KEY = "AIzaSyDHkYzWFiC6TbORwSUQJIwLC08ysYQTjJg";
+const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
+
+// Check if YouTube API key is configured
+if (!YOUTUBE_API_KEY) {
+  console.error("YouTube API key is not configured. Please set REACT_APP_YOUTUBE_API_KEY in your .env file.");
+}
 
 function getValidPoster(movie) {
   if (movie.poster_path) return TMDB_IMAGE_BASE + movie.poster_path;
@@ -83,12 +88,17 @@ const MovieDetails = ({ movie }) => {
         {trailerId && (
           <iframe
             width="100%"
-            height="250"
+            height="400"
             src={`https://www.youtube.com/embed/${trailerId}`}
             title="YouTube trailer"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            style={{
+              minHeight: '300px',
+              maxHeight: '500px',
+              aspectRatio: '16/9'
+            }}
           ></iframe>
         )}
         {trailerError && <div style={{ color: "#ff5252" }}>{trailerError}</div>}

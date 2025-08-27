@@ -7,11 +7,15 @@ import AddMovieForm from "./components/AddMovieForm";
 import SearchBar from "./components/SearchBar";
 import "./App.css";
 
-const TMDB_API_KEY = "  Your TMDb API Key";
+const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
-function Home({ movies, onSearch, onHomeSearchReset, page, totalPages, onPageChange }) {
+// Check if TMDb API key is configured
+if (!TMDB_API_KEY) {
+  console.error("TMDb API key is not configured. Please set REACT_APP_TMDB_API_KEY in your .env file.");
+}
+
+function Home({ movies, onSearch, onHomeSearchReset, page, totalPages, onPageChange, onAddMovie }) {
   const navigate = useNavigate();
   const handleHome = () => {
     onHomeSearchReset("Avengers");
@@ -41,7 +45,7 @@ function Home({ movies, onSearch, onHomeSearchReset, page, totalPages, onPageCha
           🏠 Home
         </button>
       </div>
-      <AddMovieForm onAddMovie={() => {}} />
+      <AddMovieForm onAddMovie={onAddMovie} />
       <div className="main-content">
         <MovieList movies={movies} />
       </div>
@@ -70,6 +74,7 @@ function Home({ movies, onSearch, onHomeSearchReset, page, totalPages, onPageCha
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [customMovies, setCustomMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("Avengers");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -111,6 +116,24 @@ function App() {
     setPage(1);
   };
 
+  // Handle adding custom movies
+  const handleAddMovie = (newMovie) => {
+    // Convert the form data to match the expected movie structure
+    const formattedMovie = {
+      id: newMovie.id,
+      title: newMovie.title,
+      release_date: `${newMovie.year}-01-01`,
+      overview: newMovie.description,
+      poster_path: newMovie.poster.startsWith('http') ? null : newMovie.poster, // If it's a full URL, we'll handle it differently
+      Poster: newMovie.poster.startsWith('http') ? newMovie.poster : null, // Store full URLs here
+      isCustom: true // Flag to identify custom movies
+    };
+    setCustomMovies(prev => [formattedMovie, ...prev]);
+  };
+
+  // Combine API movies with custom movies for display
+  const allMovies = [...customMovies, ...movies];
+
   return (
     <Router>
       <Routes>
@@ -118,13 +141,14 @@ function App() {
           path="/"
           element={
             <Home
-              movies={movies}
+              movies={allMovies}
               onSearch={handleSearch}
               searchTerm={searchTerm}
               onHomeSearchReset={handleSearch}
               page={page}
               totalPages={totalPages}
               onPageChange={handlePageChange}
+              onAddMovie={handleAddMovie}
             />
           }
         />
